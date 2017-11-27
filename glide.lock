@@ -1,0 +1,38 @@
+hash: ca5ac19f1a024188897660645bf1713d180d7ec293fa6d2cc417de22a6dedf34
+updated: 2017-11-28T00:58:33.833844+09:00
+imports:
+- name: github.com/andybalholm/cascadia
+  version: 349dd0209470eabd9514242c688c403c0926d266
+- name: github.com/djimenez/iconv-go
+  version: 8960e66bd3dacbc8773962b40eb82fc18c63c127
+- name: github.com/PuerkitoBio/goquery
+  version: e1271ee34c6a305e38566ecd27ae374944907ee9
+- name: github.com/tealeg/xlsx
+  version: 8be35264fa75a1bbe954ce51eba04f273e2c59e5
+- name: golang.org/x/net
+  version: c7086645de248775cbf2373cf5ca4d2fa664b8c1
+  subpackages:
+  - html
+  - html/atom
+  - html/charset
+- name: golang.org/x/text
+  version: 88f656faf3f37f690df1a32515b479415e1a6769
+  subpackages:
+  - encoding
+  - encoding/charmap
+  - encoding/htmlindex
+  - encoding/internal
+  - encoding/internal/identifier
+  - encoding/japanese
+  - encoding/korean
+  - encoding/simplifiedchinese
+  - encoding/traditionalchinese
+  - encoding/unicode
+  - internal/tag
+  - internal/utf8internal
+  - language
+  - runes
+  - transform
+- name: gopkg.in/iconv.v1
+  version: 16a760eb7e186ae0e3aedda00d4a1daa4d0701d8
+testImports: []

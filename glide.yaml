@@ -1,0 +1,14 @@
+package: github.com/sergeiten/gocafe
+import:
+- package: github.com/PuerkitoBio/goquery
+  version: ^1.1.0
+- package: github.com/tealeg/xlsx
+  version: ^1.0.3
+- package: golang.org/x/net
+  subpackages:
+  - html/charset
+- package: golang.org/x/text
+  subpackages:
+  - encoding/htmlindex
+- package: gopkg.in/iconv.v1
+  version: ^1.1.1
