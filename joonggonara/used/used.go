@@ -14,6 +14,8 @@ import (
 
 	"sync"
 
+	"time"
+
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding/htmlindex"
@@ -44,11 +46,13 @@ func Fetch(query string, pages int) [][]string {
 
 	for i := 1; i <= pages; i++ {
 		go func(page int) {
-			url := getListURL(query, page)
+			time.Sleep(time.Duration(page*100) * time.Millisecond)
 
-			list, err := getList(&wg, url)
+			listURL := getListURL(query, page)
+
+			list, err := getList(&wg, listURL)
 			if err != nil {
-				log.Printf("failed to get url: %v", err)
+				log.Printf("failed to get listURL: %v", err)
 			}
 
 			for _, l := range list {
