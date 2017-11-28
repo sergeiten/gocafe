@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/sergeiten/gocafe/joonggonara/used"
+	"github.com/sergeiten/gocafe/util"
 )
 
 var (
@@ -22,5 +23,12 @@ func init() {
 
 func main() {
 	list := used.Fetch(query, pages)
-	used.WriteXlsFile(file, list)
+	util.WriteXlsFile(file, []string{
+		"no",
+		"title",
+		"content",
+		"name",
+		"views",
+		"likes",
+	}, list)
 }

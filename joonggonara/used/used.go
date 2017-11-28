@@ -1,7 +1,6 @@
 package used
 
 import (
-	"errors"
 	"fmt"
 	"log"
 
@@ -13,8 +12,9 @@ import (
 
 	"net/url"
 
+	"sync"
+
 	"github.com/PuerkitoBio/goquery"
-	"github.com/tealeg/xlsx"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding/htmlindex"
 	iconv "gopkg.in/iconv.v1"
@@ -33,32 +33,58 @@ type item struct {
 	Likes   string
 }
 
-func Fetch(query string, pages int) []item {
-	var list []item
+func Fetch(query string, pages int) [][]string {
+	var result [][]string
 
-	q := convert(query, "utf-8", "euc-kr")
+	query = convert(query, "utf-8", "euc-kr")
+
+	var wg sync.WaitGroup
+
+	wg.Add(pages)
 
 	for i := 1; i <= pages; i++ {
-		url := fmt.Sprintf(listURL, url.QueryEscape(q), i)
-		pageList, err := getList(url)
-		if err != nil {
-			log.Printf("failed to get url: %v", err)
-		}
+		go func(page int) {
+			url := getListURL(query, page)
 
-		for _, l := range pageList {
-			list = append(list, l)
-		}
+			list, err := getList(&wg, url)
+			if err != nil {
+				log.Printf("failed to get url: %v", err)
+			}
+
+			for _, l := range list {
+				result = append(result, []string{
+					l.No,
+					l.Title,
+					l.Content,
+					l.Name,
+					l.Views,
+					l.Likes,
+				})
+			}
+		}(i)
 	}
 
-	return list
+	wg.Wait()
+
+	return result
 }
 
-func getList(url string) ([]item, error) {
+func getListURL(query string, page int) string {
+	return fmt.Sprintf(listURL, url.QueryEscape(query), page)
+}
+
+func getList(wg *sync.WaitGroup, url string) ([]item, error) {
+	defer wg.Done()
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected response code, url: %s, code: %d", url, resp.StatusCode)
+	}
 
 	reader, err := decodeHTMLBody(resp.Body, "KSC5601")
 	if err != nil {
@@ -191,51 +217,4 @@ func convert(str string, from string, to string) string {
 
 	o := converter.ConvString(str)
 	return o
-}
-
-func WriteXlsFile(filename string, items []item) error {
-	var file *xlsx.File
-	var sheet *xlsx.Sheet
-	var row *xlsx.Row
-	var err error
-
-	file = xlsx.NewFile()
-	sheet, err = file.AddSheet("Sheet1")
-	if err != nil {
-		return errors.New("error write into file: " + err.Error())
-	}
-
-	row = sheet.AddRow()
-
-	addCell(row, "no")
-	addCell(row, "title")
-	addCell(row, "content")
-	addCell(row, "name")
-	addCell(row, "views")
-	addCell(row, "likes")
-
-	for _, item := range items {
-		row = sheet.AddRow()
-
-		addCell(row, item.No)
-		addCell(row, item.Title)
-		addCell(row, item.Content)
-		addCell(row, item.Name)
-		addCell(row, item.Views)
-		addCell(row, item.Likes)
-	}
-
-	err = file.Save(filename)
-	if err != nil {
-		return errors.New("error write into file: " + err.Error())
-	}
-
-	return nil
-}
-
-// addCell adds new cell to xls file
-func addCell(row *xlsx.Row, value string) {
-	cell := row.AddCell()
-
-	cell.Value = value
 }
