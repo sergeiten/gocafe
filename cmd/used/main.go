@@ -6,13 +6,21 @@ import (
 	"github.com/sergeiten/gocafe/joonggonara/used"
 )
 
-func main() {
-	query := flag.String("query", "", "Search Query")
-	pages := flag.Int("pages", 1, "Number Of Pages")
-	file := flag.String("file", "", "Name Of XLSX File")
+var (
+	query string
+	pages int
+	file  string
+)
+
+func init() {
+	flag.StringVar(&query, "query", "", "Search query")
+	flag.IntVar(&pages, "pages", 1, "Number pages for parsing")
+	flag.StringVar(&file, "file", "", "Name of output xlsx file")
 
 	flag.Parse()
+}
 
-	list := used.Fetch(*query, *pages)
-	used.WriteXlsFile(*file, list)
+func main() {
+	list := used.Fetch(query, pages)
+	used.WriteXlsFile(file, list)
 }
